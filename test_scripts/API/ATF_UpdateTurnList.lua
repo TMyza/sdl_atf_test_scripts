@@ -194,6 +194,49 @@ function Test:updateTurnListSuccess(paramsSend)
 	EXPECT_RESPONSE(CorIdUpdateTurnList, { success = true, resultCode = "SUCCESS" })
 end
 
+function Test:updateTurnListWARNINGS(paramsSend)
+  --mobile side: send UpdateTurnList request
+  local CorIdUpdateTurnList = self.mobileSession:SendRPC("UpdateTurnList", paramsSend)
+
+  --Set location for DYNAMIC image
+  if paramsSend.softButtons then
+    --If type is IMAGE -> text parameter is omitted and vice versa
+    if paramsSend.softButtons[1].type == "IMAGE" then
+      paramsSend.softButtons[1].text = nil
+    else
+      if paramsSend.softButtons[1].type == "TEXT" then
+        paramsSend.softButtons[1].image = nil
+      end
+    end
+
+    --TODO: update after resolving APPLINK-16052
+    -- if paramsSend.softButtons[1].image then
+    --  paramsSend.softButtons[1].image.value = storagePath..paramsSend.softButtons[1].image.value
+    -- end
+    if paramsSend.softButtons then
+      for i=1,#paramsSend.softButtons do
+        if paramsSend.softButtons[i].image then
+          paramsSend.softButtons[i].image = nil
+        end
+      end
+    end
+  end
+
+  --hmi side: expect Navigation.UpdateTurnList request
+  EXPECT_HMICALL("Navigation.UpdateTurnList",
+  {
+    turnList = setExTurnList(1),
+    softButtons = paramsSend.softButtons
+  })
+  :Do(function(_,data)
+    --hmi side: send Navigation.UpdateTurnList response
+    self.hmiConnection:SendResponse(data.id, data.method, "WARNINGS",{info = "Requested image(s) not found."})
+  end)
+
+  --mobile side: expect UpdateTurnList response
+  EXPECT_RESPONSE(CorIdUpdateTurnList, { success = true, resultCode = "WARNINGS",info = "Requested image(s) not found." })
+end
+
 ---------------------------------------------------------------------------------------------
 -------------------------------------------Preconditions-------------------------------------
 ---------------------------------------------------------------------------------------------
@@ -957,6 +1000,116 @@ commonSteps:DeleteLogsFileAndPolicyTable()
 			end
 		--End Test case CommonRequestCheck.8
 ]]
+
+    --Begin Test case CommonRequestCheck.9
+      --Description: This test is intended to check positive cases and when all parameters are in boundary conditions and with Invalid Image
+
+
+      function Test:UpdateTurnList_InvalidImage()
+        local request = {
+          turnList =
+          {
+            {
+              navigationText ="Text",
+              turnIcon =
+              {
+                value ="notavailable.png",
+                imageType ="DYNAMIC",
+              }
+            }
+          },
+          softButtons =
+          {
+            {
+              type ="BOTH",
+              text ="Close",
+              image =
+              {
+                value ="notavailable.png",
+                imageType ="DYNAMIC",
+              },
+              isHighlighted = true,
+              softButtonID = 111,
+              systemAction ="DEFAULT_ACTION",
+            }
+          }
+        }
+        self:updateTurnListWARNINGS(request)
+      end
+    --End Test case CommonRequestCheck.9
+    
+     --Begin Test case CommonRequestCheck.10
+      --Description: This test is intended to check positive cases and when all parameters are in boundary conditions and with Invalid Image
+
+
+      function Test:UpdateTurnList_InvalidImage_SoftButton()
+        local request = {
+          turnList =
+          {
+            {
+              navigationText ="Text",
+              turnIcon =
+              {
+                value ="icon.png",
+                imageType ="DYNAMIC",
+              }
+            }
+          },
+          softButtons =
+          {
+            {
+              type ="BOTH",
+              text ="Close",
+              image =
+              {
+                value ="notavailable.png",
+                imageType ="DYNAMIC",
+              },
+              isHighlighted = true,
+              softButtonID = 111,
+              systemAction ="DEFAULT_ACTION",
+            }
+          }
+        }
+        self:updateTurnListWARNINGS(request)
+      end
+    --End Test case CommonRequestCheck.10
+       --Begin Test case CommonRequestCheck.11
+      --Description: This test is intended to check positive cases and when all parameters are in boundary conditions and with Invalid Image
+
+      function Test:UpdateTurnList_InvalidImage_TurnIcon()
+        local request = {
+          turnList =
+          {
+            {
+              navigationText ="Text",
+              turnIcon =
+              {
+                value ="icon.png",
+                imageType ="DYNAMIC",
+              }
+            }
+          },
+          softButtons =
+          {
+            {
+              type ="BOTH",
+              text ="Close",
+              image =
+              {
+                value ="notavailable.png",
+                imageType ="DYNAMIC",
+              },
+              isHighlighted = true,
+              softButtonID = 111,
+              systemAction ="DEFAULT_ACTION",
+            }
+          }
+        }
+        self:updateTurnListWARNINGS(request)
+      end
+    --End Test case CommonRequestCheck.11
+    
 	--End Test suit CommonRequestCheck
 
 ---------------------------------------------------------------------------------------------
