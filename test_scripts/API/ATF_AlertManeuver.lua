@@ -1328,6 +1328,309 @@ end
 
 		--End Test case CommonRequestCheck.6
 
+    --Begin Test case CommonRequestCheck.7
+    --Description: Positive case and in boundary conditions (with conditional parameters) and invalid image
+    
+      function Test:AlertManeuver_InvalidImage() 
+
+        --mobile side: AlertManeuver request 
+        local CorIdAlertM = self.mobileSession:SendRPC("AlertManeuver",
+                                {
+                                     
+                                  ttsChunks = 
+                                  { 
+                                    
+                                    { 
+                                      text ="FirstAlert",
+                                      type ="TEXT",
+                                    }, 
+                                    
+                                    { 
+                                      text ="SecondAlert",
+                                      type ="TEXT",
+                                    }, 
+                                  }, 
+                                  softButtons = 
+                                  { 
+                                    
+                                    { 
+                                      type = "BOTH",
+                                      text = "Close",
+                                       image = 
+                                
+                                      { 
+                                        value = "icon.png",
+                                        imageType = "DYNAMIC",
+                                      }, 
+                                      isHighlighted = true,
+                                      softButtonID = 7821,
+                                      systemAction = "DEFAULT_ACTION",
+                                    }, 
+                                    
+                                    { 
+                                      type = "BOTH",
+                                      text = "AnotherClose",
+                                       image = 
+                                
+                                      { 
+                                        value = "notavailable.png",
+                                        imageType = "DYNAMIC",
+                                      }, 
+                                      isHighlighted = false,
+                                      softButtonID = 7822,
+                                      systemAction = "DEFAULT_ACTION",
+                                    },
+                                  }
+                                
+                                })
+
+        local AlertId
+        --hmi side: Navigation.AlertManeuver request 
+        EXPECT_HMICALL("Navigation.AlertManeuver", 
+                { 
+                  appID = self.applications["Test Application"],
+                  softButtons = 
+                  { 
+                    
+                    { 
+                      type = "BOTH",
+                      text = "Close",
+                        --[[ TODO: update after resolving APPLINK-16052
+
+                       image = 
+                
+                      { 
+                        value = pathToIconFolder .. "/icon.png",
+                        imageType = "DYNAMIC",
+                      },]] 
+                      isHighlighted = true,
+                      softButtonID = 7821,
+                      systemAction = "DEFAULT_ACTION",
+                    }, 
+                    
+                    { 
+                      type = "BOTH",
+                      text = "AnotherClose",
+                        --[[ TODO: update after resolving APPLINK-16052
+
+                       image = 
+                
+                      { 
+                        value = pathToIconFolder.. "/notavailable.png",
+                        imageType = "DYNAMIC",
+                      },]] 
+                      isHighlighted = false,
+                      softButtonID = 7822,
+                      systemAction = "DEFAULT_ACTION",
+                    } 
+                  }
+                })
+          :Do(function(_,data)
+            AlertId = data.id
+            local function alertResponse()
+              self.hmiConnection:SendResponse(AlertId, "Navigation.AlertManeuver", "WARNINGS", {info = "Requested image(s) not found."})
+            end
+
+            RUN_AFTER(alertResponse, 2000)
+          end)
+
+        local SpeakId
+        --hmi side: TTS.Speak request 
+        EXPECT_HMICALL("TTS.Speak", 
+                { 
+                  ttsChunks = 
+                    { 
+                      
+                      { 
+                        text ="FirstAlert",
+                        type ="TEXT",
+                      }, 
+                      
+                      { 
+                        text ="SecondAlert",
+                        type ="TEXT",
+                      }
+                    },
+                  speakType = "ALERT_MANEUVER",
+
+                })
+          :Do(function(_,data)
+            self.hmiConnection:SendNotification("TTS.Started")
+            SpeakId = data.id
+
+            local function speakResponse()
+              self.hmiConnection:SendResponse(SpeakId, "TTS.Speak", "SUCCESS", { })
+
+              self.hmiConnection:SendNotification("TTS.Stopped")
+            end
+
+            RUN_AFTER(speakResponse, 1000)
+
+          end)
+           
+
+        --mobile side: OnHMIStatus notifications
+        ExpectOnHMIStatusWithAudioStateChanged(self)
+
+          --mobile side: expect AlertManeuver response
+          EXPECT_RESPONSE(CorIdAlertM, { success = true, resultCode = "WARNINGS",info = "Requested image(s) not found." })
+            :Timeout(11000)
+
+      end
+
+    --End Test case CommonRequestCheck.7
+    
+    --Begin Test case CommonRequestCheck.8
+    --Description: Positive case and in boundary conditions (with conditional parameters) and invalid image
+    
+      function Test:AlertManeuver_InvalidImage_SoftButton() 
+
+        --mobile side: AlertManeuver request 
+        local CorIdAlertM = self.mobileSession:SendRPC("AlertManeuver",
+                                {
+                                     
+                                  ttsChunks = 
+                                  { 
+                                    
+                                    { 
+                                      text ="FirstAlert",
+                                      type ="TEXT",
+                                    }, 
+                                    
+                                    { 
+                                      text ="SecondAlert",
+                                      type ="TEXT",
+                                    }, 
+                                  }, 
+                                  softButtons = 
+                                  { 
+                                    
+                                    { 
+                                      type = "BOTH",
+                                      text = "Close",
+                                       image = 
+                                
+                                      { 
+                                        value = "notavailable.png",
+                                        imageType = "DYNAMIC",
+                                      }, 
+                                      isHighlighted = true,
+                                      softButtonID = 8821,
+                                      systemAction = "DEFAULT_ACTION",
+                                    }, 
+                                    
+                                    { 
+                                      type = "BOTH",
+                                      text = "AnotherClose",
+                                       image = 
+                                
+                                      { 
+                                        value = "icon.png",
+                                        imageType = "DYNAMIC",
+                                      }, 
+                                      isHighlighted = false,
+                                      softButtonID = 8822,
+                                      systemAction = "DEFAULT_ACTION",
+                                    },
+                                  }
+                                
+                                })
+
+        local AlertId
+        --hmi side: Navigation.AlertManeuver request 
+        EXPECT_HMICALL("Navigation.AlertManeuver", 
+                { 
+                  appID = self.applications["Test Application"],
+                  softButtons = 
+                  { 
+                    
+                    { 
+                      type = "BOTH",
+                      text = "Close",
+                        --[[ TODO: update after resolving APPLINK-16052
+
+                       image = 
+                
+                      { 
+                        value = pathToIconFolder .. "/notavailable.png",
+                        imageType = "DYNAMIC",
+                      },]] 
+                      isHighlighted = true,
+                      softButtonID = 8821,
+                      systemAction = "DEFAULT_ACTION",
+                    }, 
+                    
+                    { 
+                      type = "BOTH",
+                      text = "AnotherClose",
+                        --[[ TODO: update after resolving APPLINK-16052
+
+                       image = 
+                
+                      { 
+                        value = pathToIconFolder.. "/icon.png",
+                        imageType = "DYNAMIC",
+                      },]] 
+                      isHighlighted = false,
+                      softButtonID = 8822,
+                      systemAction = "DEFAULT_ACTION",
+                    } 
+                  }
+                })
+          :Do(function(_,data)
+            AlertId = data.id
+            local function alertResponse()
+              self.hmiConnection:SendResponse(AlertId, "Navigation.AlertManeuver", "WARNINGS", {info = "Requested image(s) not found."})
+            end
+
+            RUN_AFTER(alertResponse, 2000)
+          end)
+
+        local SpeakId
+        --hmi side: TTS.Speak request 
+        EXPECT_HMICALL("TTS.Speak", 
+                { 
+                  ttsChunks = 
+                    { 
+                      
+                      { 
+                        text ="FirstAlert",
+                        type ="TEXT",
+                      }, 
+                      
+                      { 
+                        text ="SecondAlert",
+                        type ="TEXT",
+                      }
+                    },
+                  speakType = "ALERT_MANEUVER",
+
+                })
+          :Do(function(_,data)
+            self.hmiConnection:SendNotification("TTS.Started")
+            SpeakId = data.id
+
+            local function speakResponse()
+              self.hmiConnection:SendResponse(SpeakId, "TTS.Speak", "SUCCESS", { })
+
+              self.hmiConnection:SendNotification("TTS.Stopped")
+            end
+
+            RUN_AFTER(speakResponse, 1000)
+
+          end)
+           
+
+        --mobile side: OnHMIStatus notifications
+        ExpectOnHMIStatusWithAudioStateChanged(self)
+
+          --mobile side: expect AlertManeuver response
+          EXPECT_RESPONSE(CorIdAlertM, { success = true, resultCode = "WARNINGS",info = "Requested image(s) not found." })
+            :Timeout(11000)
+
+      end
+
+    --End Test case CommonRequestCheck.8
 
 	--End Test suit CommonRequestCheck
 

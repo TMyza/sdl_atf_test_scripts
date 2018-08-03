@@ -132,4 +132,18 @@ function m.preconditions()
   common.initSDLCertificates("./files/Security/GetSystemTime_certificates/client_credential.pem", false)
 end
 
+local policyTableUpdate_orig = m.policyTableUpdate
+
+function m.policyTableUpdate(pPTUpdateFunc)
+  local function expNotificationFunc()
+    m.getHMIConnection():ExpectRequest("BasicCommunication.DecryptCertificate")
+    :Do(function(_, d)
+        m.getHMIConnection():SendResponse(d.id, d.method, "SUCCESS", { })
+      end)
+    :Times(AnyNumber())
+    m.getHMIConnection():ExpectRequest("VehicleInfo.GetVehicleData", { odometer = true })
+  end
+  policyTableUpdate_orig(pPTUpdateFunc, expNotificationFunc)
+end
+
 return m

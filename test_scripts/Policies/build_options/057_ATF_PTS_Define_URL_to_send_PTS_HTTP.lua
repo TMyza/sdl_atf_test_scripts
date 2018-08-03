@@ -196,7 +196,7 @@ function Test:RegisterApp_2()
       print("SDL->MOB2: OnSystemRequest, requestType: " .. data.payload.requestType)
       if(data.payload.requestType == "HTTP") then
         if(data.payload.url ~= nil) then
-          r_actual_app = 1
+          r_actual_app = 2
           r_actual_url = data.payload.url
         end
       end
@@ -207,7 +207,7 @@ function Test:RegisterApp_2()
       print("SDL->MOB1: OnSystemRequest, requestType: " .. data.payload.requestType)
       if(data.payload.requestType == "HTTP") then
         if(data.payload.url ~= nil) then
-          r_actual_app = 2
+          r_actual_app = 1
           r_actual_url = data.payload.url
         end
       end
