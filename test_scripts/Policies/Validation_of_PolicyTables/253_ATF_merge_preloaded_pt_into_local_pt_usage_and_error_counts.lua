@@ -95,7 +95,7 @@ local function updatePreloadedPt(updaters)
       updateFunc(data)
     end
   end
-
+  data.policy_table.app_policies["0000001"] = "default"
   local dataToWrite = json.encode(data)
   file = io.open(pathToFile, "w")
   file:write(dataToWrite)
@@ -198,7 +198,7 @@ testCasesForPolicyTable.Delete_Policy_table_snapshot()
 commonSteps:DeleteLogsFileAndPolicyTable()
 commonPreconditions:BackupFile(PRELOADED_PT_FILE_NAME)
 prepareInitialPreloadedPT()
-commonPreconditions:Connecttest_without_ExitBySDLDisconnect_WithoutOpenConnectionRegisterApp("connecttest_ConnectMobile.lua")
+-- commonPreconditions:Connecttest_without_ExitBySDLDisconnect_WithoutOpenConnectionRegisterApp("connecttest_ConnectMobile.lua")
 
 --[[ General configuration parameters ]]
 -- Test = require('user_modules/connecttest_ConnectMobile')

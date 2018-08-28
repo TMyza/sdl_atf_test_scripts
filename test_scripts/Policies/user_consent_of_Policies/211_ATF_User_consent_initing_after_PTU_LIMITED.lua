@@ -35,7 +35,7 @@ function Test:Precondition_Activate_app()
 end
 
 function Test:Precondition_Switch_app_to_LIMITED()
-  self.hmiConnection:SendNotification("BasicCommunication.OnEventChanged",{isActive = true,eventName ="AUDIO_SOURCE"})
+  self.hmiConnection:SendNotification("BasicCommunication.OnAppDeactivated", {appID = self.applications[config.application1.registerAppInterfaceParams.appName] })
   self.mobileSession:ExpectNotification("OnHMIStatus",{hmiLevel ="LIMITED", systemContext = "MAIN"})
 end
 

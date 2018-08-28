@@ -651,6 +651,57 @@ end
 				end
 			--End Test case CommonRequestCheck.3.10
 			
+		  --Begin Test case CommonRequestCheck.4
+   
+      function Test:CreateInteractionChoiceSet_InvalidImage()
+          --mobile side: sending CreateInteractionChoiceSet request
+          local cid = self.mobileSession:SendRPC("CreateInteractionChoiceSet",
+                              {
+                                interactionChoiceSetID = 1108,
+                                choiceSet = 
+                                { 
+                                  
+                                  { 
+                                    choiceID = 1108,
+                                    menuName ="Choice1108",
+                                    vrCommands = 
+                                    { 
+                                      "Choice1108",
+                                    }, 
+                                    image =
+                                    { 
+                                      value ="notavailable.png",
+                                      imageType ="DYNAMIC",
+                                    }, 
+                                  }
+                                }
+                              })
+          
+            
+          --hmi side: expect VR.AddCommand request
+          EXPECT_HMICALL("VR.AddCommand", 
+                  { 
+                    cmdID = 1108,
+                    appID = applicationID,
+                    type = "Choice",
+                    vrCommands = {"Choice1108" }
+                  })
+          :Do(function(_,data)
+            --hmi side: sending VR.AddCommand response
+            grammarIDValue = data.params.grammarID
+            self.hmiConnection:SendResponse(data.id, data.method, "WARNINGS", {info="Requested image(s) not found."})
+          end)
+          
+          --mobile side: expect CreateInteractionChoiceSet response
+          EXPECT_RESPONSE(cid, { success = true, resultCode = "WARNINGS",info="Requested image(s) not found." })
+
+          --mobile side: expect OnHashChange notification
+          EXPECT_NOTIFICATION("OnHashChange")
+        end
+    --End Test case CommonRequestCheck.4
+    
+    -----------------------------------------------------------------------------------------
+			
 		--Begin Test case CommonRequestCheck.3
 		
 		-----------------------------------------------------------------------------------------

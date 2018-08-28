@@ -136,6 +136,7 @@ end
 commonFunctions:newTestCasesGroup("Test")
 function Test:TestStep_PTU_NotSuccessful_AppID_ListedPT_NewIgnCycle()
   local is_test_fail
+  EXPECT_HMINOTIFICATION("SDL.OnStatusUpdate", {status = "UPDATE_NEEDED"})
   local correlationId = self.mobileSession:SendRPC("RegisterAppInterface", config.application1.registerAppInterfaceParams)
 
   EXPECT_HMINOTIFICATION("BasicCommunication.OnAppRegistered", { application = { appName = config.application1.appName } })

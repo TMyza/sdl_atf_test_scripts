@@ -253,6 +253,71 @@ end
 
 ---------------------------------------------------------------------------------------------
 
+
+--This function sends a request from mobile and verify result on HMI and mobile for WARNINGS resultCode cases.
+function Test:verify_WARNINGS_Case(RequestParams)
+  --Check if send any empty array or empty struct
+  local temp = json.encode(RequestParams)
+  local cid = 0
+  if string.find(temp, "{}") ~= nil or string.find(temp, "{{}}") ~= nil then
+    temp = string.gsub(temp, "{}", "[]")
+    temp = string.gsub(temp, "{{}}", "[{}]")
+
+    self.mobileSession.correlationId = self.mobileSession.correlationId + 1
+
+    local msg =
+    {
+      serviceType      = 7,
+      frameInfo        = 0,
+      rpcType          = 0,
+      rpcFunctionId    = 27,
+      rpcCorrelationId = self.mobileSession.correlationId,
+      payload          = temp
+    }
+
+    cid = self.mobileSession.correlationId
+
+    self.mobileSession:Send(msg)
+
+  else
+    --mobile side: sending ShowConstantTBT request
+    cid = self.mobileSession:SendRPC("ShowConstantTBT", RequestParams)
+  end
+
+  -- TODO: remove after resolving APPLINK-16094
+  ---------------------------------------------
+
+  if
+    (RequestParams.softButtons and
+    #RequestParams.softButtons == 0) then
+      RequestParams.softButtons = nil
+  end
+
+  if RequestParams.softButtons then
+    for i=1,#RequestParams.softButtons do
+      if RequestParams.softButtons[i].image then
+        RequestParams.softButtons[i].image = nil
+      end
+    end
+
+  end
+  ---------------------------------------------
+
+  UIParams = self:createUIParameters(RequestParams)
+
+  --hmi side: expect Navigation.ShowConstantTBT request
+  EXPECT_HMICALL("Navigation.ShowConstantTBT", UIParams)
+  :Do(function(_,data)
+    --hmi side: sending Navigation.ShowConstantTBT response
+    self.hmiConnection:SendResponse(data.id, data.method, "WARNINGS", {info = "Requested image(s) not found."})
+  end)
+
+  --mobile side: expect SetGlobalProperties response
+  EXPECT_RESPONSE(cid, { success = true, resultCode = "WARNINGS",info = "Requested image(s) not found." })
+end
+
+---------------------------------------------------------------------------------------------
+--
 --This function sends a request from mobile with INVALID_DATA and verify result on mobile.
 function Test:verify_INVALID_DATA_Case(RequestParams)
 	--Check if send any empty array or empty struct
@@ -523,6 +588,162 @@ end
 	function Test:ShowConstantTBT_Positive()
 		self:verify_SUCCESS_Case(Request)
 	end
+	
+	 local Request = {
+            navigationText1 ="navigationText1",
+            navigationText2 ="navigationText2",
+            eta ="12:34",
+            totalDistance ="100miles",
+            turnIcon =
+            {
+              value ="notavailable.png",
+              imageType ="DYNAMIC",
+            },
+            nextTurnIcon =
+            {
+              value ="notavailable.png",
+              imageType ="DYNAMIC",
+            },
+            distanceToManeuver = 50.5,
+            distanceToManeuverScale = 100.5,
+            maneuverComplete = false,
+            softButtons =
+            {
+
+              {
+                type ="BOTH",
+                text ="Close",
+                image =
+                {
+                  value ="notavailable.png",
+                  imageType ="DYNAMIC",
+                },
+                isHighlighted = true,
+                softButtonID = 44,
+                systemAction ="DEFAULT_ACTION",
+              },
+            },
+          }
+  function Test:ShowConstantTBT_Positive_InvalidImage()
+    self:verify_WARNINGS_Case(Request)
+  end
+  
+     local Request = {
+            navigationText1 ="navigationText1",
+            navigationText2 ="navigationText2",
+            eta ="12:34",
+            totalDistance ="100miles",
+            turnIcon =
+            {
+              value ="notavailable.png",
+              imageType ="DYNAMIC",
+            },
+            nextTurnIcon =
+            {
+              value ="icon.png",
+              imageType ="DYNAMIC",
+            },
+            distanceToManeuver = 50.5,
+            distanceToManeuverScale = 100.5,
+            maneuverComplete = false,
+            softButtons =
+            {
+
+              {
+                type ="BOTH",
+                text ="Close",
+                image =
+                {
+                  value ="icon.png",
+                  imageType ="DYNAMIC",
+                },
+                isHighlighted = true,
+                softButtonID = 44,
+                systemAction ="DEFAULT_ACTION",
+              },
+            },
+          }
+  function Test:ShowConstantTBT_Positive_InvalidImage_TurnIcon()
+    self:verify_WARNINGS_Case(Request)
+  end
+  
+       local Request = {
+            navigationText1 ="navigationText1",
+            navigationText2 ="navigationText2",
+            eta ="12:34",
+            totalDistance ="100miles",
+            turnIcon =
+            {
+              value ="icon.png",
+              imageType ="DYNAMIC",
+            },
+            nextTurnIcon =
+            {
+              value ="icon.png",
+              imageType ="DYNAMIC",
+            },
+            distanceToManeuver = 50.5,
+            distanceToManeuverScale = 100.5,
+            maneuverComplete = false,
+            softButtons =
+            {
+
+              {
+                type ="BOTH",
+                text ="Close",
+                image =
+                {
+                  value ="notavailable.png",
+                  imageType ="DYNAMIC",
+                },
+                isHighlighted = true,
+                softButtonID = 44,
+                systemAction ="DEFAULT_ACTION",
+              },
+            },
+          }
+  function Test:ShowConstantTBT_Positive_InvalidImage_SoftButton()
+    self:verify_WARNINGS_Case(Request)
+  end
+  
+         local Request = {
+            navigationText1 ="navigationText1",
+            navigationText2 ="navigationText2",
+            eta ="12:34",
+            totalDistance ="100miles",
+            turnIcon =
+            {
+              value ="icon.png",
+              imageType ="DYNAMIC",
+            },
+            nextTurnIcon =
+            {
+              value ="notavailable.png",
+              imageType ="DYNAMIC",
+            },
+            distanceToManeuver = 50.5,
+            distanceToManeuverScale = 100.5,
+            maneuverComplete = false,
+            softButtons =
+            {
+
+              {
+                type ="BOTH",
+                text ="Close",
+                image =
+                {
+                  value ="icon.png",
+                  imageType ="DYNAMIC",
+                },
+                isHighlighted = true,
+                softButtonID = 44,
+                systemAction ="DEFAULT_ACTION",
+              },
+            },
+          }
+  function Test:ShowConstantTBT_Positive_InvalidImage_NextTurnIcon()
+    self:verify_WARNINGS_Case(Request)
+  end
 
 	local Request = {
 						navigationText1 ="navigationText1",

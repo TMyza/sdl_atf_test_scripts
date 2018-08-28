@@ -1276,6 +1276,56 @@ end
 				end		
 			--End Test case CommonRequestCheck.4.9
 			
+      -----------------------------------------------------------------------------------------
+
+      --Begin Test case CommonRequestCheck.4.10
+      --Description: Mandatory missing - vrCommands
+        function Test:AddCommand_iconNotSent()
+          --mobile side: sending AddCommand request
+          local cid = self.mobileSession:SendRPC("AddCommand",
+                              {
+                                cmdID = 511,
+                                menuParams =
+                                {
+                                  parentID = 1,
+                                  position = 0,
+                                  menuName ="Command511"
+                                },
+                                cmdIcon =
+                                {
+                                  value ="missed_icon.png",
+                                  imageType ="DYNAMIC"
+                                }
+                              })
+
+          --hmi side: expect UI.AddCommand request
+          EXPECT_HMICALL("UI.AddCommand",
+                  {
+                    cmdID = 511,
+                    menuParams =
+                    {
+                      parentID = 1,
+                      position = 0,
+                      menuName ="Command511"
+                    },
+                    cmdIcon =
+                    {
+                      value ="missed_icon.png",
+                      imageType ="DYNAMIC"
+                    }
+                  })
+          :Do(function(_,data)
+            --hmi side: sending UI.AddCommand response
+            self.hmiConnection:SendResponse(data.id, data.method, "WARNINGS", {info = "Requested image(s) not found."})
+          end)
+
+          --mobile side: expect AddCommand response
+          EXPECT_RESPONSE(cid, { success = true, resultCode = "WARNINGS" })
+
+          --mobile side: expect OnHashChange notification
+          EXPECT_NOTIFICATION("OnHashChange")
+        end
+      --End Test case CommonRequestCheck.4.10
 		--End Test case CommonRequestCheck.4
 		
 		-----------------------------------------------------------------------------------------
