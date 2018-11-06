@@ -1,11 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 -- In case:
 -- 1) Mobile app is subscribed for button_1
@@ -42,7 +37,7 @@ local function checkResumptionData(pAppId)
   end)
   EXPECT_HMICALL("Buttons.UnsubscribeButton",
     { appID = common.getHMIAppId(pAppId), buttonName = buttonName })
-    :Times(1)
+  :Times(1)
     :Do(function(_, data)
         common.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { })
     end)

@@ -1,11 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 -- In case:
 -- 1) UnsubscribeButton RPC is not allowed by policy
@@ -41,7 +36,7 @@ runner.Step("SubscribeButton " .. buttonName, common.rpcSuccess, { 1, "Subscribe
 runner.Step("On Button Press " .. buttonName, common.buttonPress, { 1, buttonName })
 
 runner.Title("Test")
-runner.Step("UnsubscribeButton on " .. buttonName .. " button, Disalloved",
+runner.Step("UnsubscribeButton on " .. buttonName .. " button, disallowed",
     common.rpcUnsuccess, { 1, "UnsubscribeButton", buttonName, errorCode })
 runner.Step("Button  " .. buttonName .. " still subscribed", common.buttonPress, { 1, buttonName })
 

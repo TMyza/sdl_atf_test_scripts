@@ -1,11 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 --  Sending an event notification without App ID only to app in full
 -- In case:
@@ -46,17 +41,17 @@ local function buttonPressWithoutAppId(pAppFULL, pAppLIMITED, pButtonName)
   common.getMobileSession(pAppFULL):ExpectNotification( "OnButtonEvent",
     { buttonName = pButtonName, buttonEventMode = "BUTTONDOWN"},
     { buttonName = pButtonName, buttonEventMode = "BUTTONUP"})
-    :Times(2)
+  :Times(2)
   common.getMobileSession(pAppFULL):ExpectNotification( "OnButtonPress",
     { buttonName = pButtonName, buttonPressMode = "SHORT"})
 
   common.getMobileSession(pAppLIMITED):ExpectNotification( "OnButtonEvent",
     { buttonName = pButtonName, buttonEventMode = "BUTTONDOWN"},
     { buttonName = pButtonName, buttonEventMode = "BUTTONUP"})
-    :Times(0)
+  :Times(0)
   common.getMobileSession(pAppLIMITED):ExpectNotification( "OnButtonPress",
     { buttonName = pButtonName, buttonPressMode = "SHORT"})
-    :Times(0)
+  :Times(0)
 end
 
 --[[ Scenario ]]

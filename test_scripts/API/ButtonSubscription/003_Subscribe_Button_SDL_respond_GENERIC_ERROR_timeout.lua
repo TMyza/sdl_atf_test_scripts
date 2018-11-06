@@ -1,11 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 -- In case:
 -- 1) Mobile app requests SubscribeButton(button_1)
@@ -36,7 +31,7 @@ runner.Step("App activation", common.activateApp)
 runner.Title("Test")
 for _, buttonName in pairs(common.buttons) do
     runner.Step("Failure Subscribe on " ..  buttonName .. " button, return GENERIC_ERROR",
-        common.rpcHMIwithoutResponce, { 1, "SubscribeButton", buttonName, errorCode })
+        common.rpcHMIwithoutResponse, { 1, "SubscribeButton", buttonName, errorCode })
     runner.Step("Button ".. buttonName .. " wasn't Subscribed", common.buttonPressUnsuccess, { 1, buttonName })
 end
 

@@ -1,16 +1,11 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 -- In case:
 -- 1) Mobile app is subscribed for button_1
 -- 2) Mobile app requests UnsubscribeButton(button_1)
--- 3_ SDL sends Buttons.UnsubscribeButton(button_1, appId) to HMI
+-- 3) SDL sends Buttons.UnsubscribeButton(button_1, appId) to HMI
 -- 4) HMI does not respond during default timeout
 -- 5) SDL responds UnsubscribeButton(GENERIC_ERROR) to mobile app
 -- 6) HMI sends Buttons.UnsubscribeButton(SUCCESS) to SDL

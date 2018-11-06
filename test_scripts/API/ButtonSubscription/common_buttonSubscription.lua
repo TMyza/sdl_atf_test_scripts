@@ -11,7 +11,6 @@ local utils = require("user_modules/utils")
 local test = require("user_modules/dummy_connecttest")
 local events = require('events')
 
-
 --[[ Variables ]]
 local m = actions
 m.hashId = {}
@@ -86,9 +85,9 @@ m.errorCode = {
 function m.rpcSuccess(pAppId, pRpc, pButtonName)
   local cid = m.getMobileSession(pAppId):SendRPC(pRpc, { buttonName = pButtonName })
   EXPECT_HMICALL("Buttons." .. pRpc,{ appID = m.getHMIAppId(pAppId), buttonName = pButtonName })
-    :Do(function(_, data)
-        m.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { })
-      end)
+  :Do(function(_, data)
+    m.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { })
+  end)
   m.getMobileSession(pAppId):ExpectResponse(cid, { success = true, resultCode = "SUCCESS" })
   m.getMobileSession(pAppId):ExpectNotification("OnHashChange")
   :Do(function(_, data)
@@ -107,10 +106,10 @@ end
 function m.rpcUnsuccess(pAppId, pRpc, pButtonName, pResultCode)
   local cid = m.getMobileSession(pAppId):SendRPC(pRpc, { buttonName = pButtonName })
   EXPECT_HMICALL("Buttons." .. pRpc,{ appID = m.getHMIAppId(pAppId), buttonName = pButtonName })
-    :Times(0)
+  :Times(0)
   m.getMobileSession(pAppId):ExpectResponse(cid, { success = false, resultCode = pResultCode })
   m.getMobileSession(pAppId):ExpectNotification("OnHashChange")
-    :Times(0)
+  :Times(0)
 end
 
 --[[ @buttonPress: performs press button
@@ -123,20 +122,20 @@ end
 function m.buttonPress(pAppId, pButtonName, pCustomButtonID)
   if not pAppId then pAppId = 1 end
   m.getHMIConnection():SendNotification("Buttons.OnButtonEvent",
-    { name = pButtonName, mode = "BUTTONDOWN", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID, })
+    { name = pButtonName, mode = "BUTTONDOWN", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID })
   m.getHMIConnection():SendNotification("Buttons.OnButtonPress",
-    { name = pButtonName, mode = "SHORT", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID, })
+    { name = pButtonName, mode = "SHORT", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID })
   m.getHMIConnection():SendNotification("Buttons.OnButtonEvent",
-    { name = pButtonName, mode = "BUTTONUP", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID, })
+    { name = pButtonName, mode = "BUTTONUP", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID })
   m.getMobileSession(pAppId):ExpectNotification( "OnButtonEvent",
     { buttonName = pButtonName, buttonEventMode = "BUTTONDOWN", customButtonID = pCustomButtonID },
     { buttonName = pButtonName, buttonEventMode = "BUTTONUP",  customButtonID = pCustomButtonID })
-    :Times(2)
+  :Times(2)
   m.getMobileSession(pAppId):ExpectNotification( "OnButtonPress",
     { buttonName = pButtonName, buttonPressMode = "SHORT",  customButtonID = pCustomButtonID })
 end
 
---[[ @buttonPressUnsuccess: performs unsuccess press button
+--[[ @buttonPressUnsuccess: performs unsuccessful press button
 --! @parameters:
 --! pAppId - application number (1, 2, etc.)
 --! pButtonName - button name
@@ -152,12 +151,12 @@ function m.buttonPressUnsuccess(pAppId, pButtonName, pCustomButtonID)
     m.getHMIConnection():SendNotification("Buttons.OnButtonEvent",
       { name = pButtonName, mode = "BUTTONUP", appID = m.getHMIAppId(pAppId), customButtonID = pCustomButtonID })
     m.getMobileSession(pAppId):ExpectNotification( "OnButtonEvent")
-      :Times(0)
+    :Times(0)
     m.getMobileSession(pAppId):ExpectNotification("OnButtonPress")
-      :Times(0)
+    :Times(0)
 end
 
---[[ @rpcHMIwithoutResponce: performs case when HMI did not respond
+--[[ @rpcHMIwithoutResponse: performs case when HMI did not respond
 --! @parameters:
 --! pAppId - application number (1, 2, etc.)
 --! pRpc - RPC name
@@ -165,18 +164,18 @@ end
 --! pErrorCode - result error
 --! @return: none
 --]]
-function m.rpcHMIwithoutResponce(pAppId, pRpc, pButtonName, pErrorCode)
+function m.rpcHMIwithoutResponse(pAppId, pRpc, pButtonName, pErrorCode)
   local cid = m.getMobileSession(pAppId):SendRPC(pRpc, { buttonName = pButtonName })
   EXPECT_HMICALL("Buttons." .. pRpc,{ appID = m.getHMIAppId(pAppId), buttonName = pButtonName })
-    :Do(function()
-      -- HMI did not response
-    end)
+  :Do(function()
+    -- HMI did not response
+  end)
   m.getMobileSession(pAppId):ExpectResponse(cid, { success = false, resultCode = pErrorCode })
   m.getMobileSession(pAppId):ExpectNotification("OnHashChange")
   :Times(0)
 end
 
---[[ @rpcHMIResponceErrorCode: performs case when HMI respond with error code
+--[[ @rpcHMIResponseErrorCode: performs case when HMI respond with error code
 --! @parameters:
 --! pAppId - application number (1, 2, etc.)
 --! pRpc - RPC name
@@ -184,12 +183,12 @@ end
 --! pErrorCode - result error
 --! @return: none
 --]]
-function m.rpcHMIResponceErrorCode(pAppId, pRpc, pButtonName, pErrorCode)
+function m.rpcHMIResponseErrorCode(pAppId, pRpc, pButtonName, pErrorCode)
   local cid = m.getMobileSession(pAppId):SendRPC(pRpc, { buttonName = pButtonName })
   EXPECT_HMICALL("Buttons." .. pRpc,{ appID = m.getHMIAppId(pAppId), buttonName = pButtonName })
-    :Do(function(_, data)
-      m.getHMIConnection():SendError(data.id, data.method, pErrorCode, "Error code")
-    end)
+  :Do(function(_, data)
+    m.getHMIConnection():SendError(data.id, data.method, pErrorCode, "Error code")
+  end)
   m.getMobileSession(pAppId):ExpectResponse(cid, { success = false, resultCode = pErrorCode })
   m.getMobileSession(pAppId):ExpectNotification("OnHashChange")
   :Times(0)
@@ -203,10 +202,10 @@ function m.unexpectedDisconnect()
   test.mobileConnection:Close()
   m.getHMIConnection():ExpectNotification("BasicCommunication.OnAppUnregistered", { unexpectedDisconnect = true })
   :Do(function()
-      for i = 1, m.getAppsCount() do
-        test.mobileSession[i] = nil
-      end
-    end)
+    for i = 1, m.getAppsCount() do
+      test.mobileSession[i] = nil
+    end
+  end)
 end
 
 --[[ @connectMobile: create connection
@@ -217,8 +216,8 @@ function m.connectMobile()
   test.mobileConnection:Connect()
   EXPECT_EVENT(events.connectedEvent, "Connected")
   :Do(function()
-      utils.cprint(35, "Mobile connected")
-    end)
+    utils.cprint(35, "Mobile connected")
+  end)
 end
 
 --[[ @reRegisterAppSuccess: re-register application with SUCCESS resultCode
@@ -233,17 +232,17 @@ function m.reRegisterAppSuccess(pAppId, pCheckResumptionData, pCheckResumptionHM
   local mobSession = m.getMobileSession(pAppId)
   mobSession:StartService(7)
   :Do(function()
-      local params = m.cloneTable(m.getConfigAppParams(pAppId))
-      params.hashID = m.hashId[pAppId]
-      local corId = mobSession:SendRPC("RegisterAppInterface", params)
-      m.getHMIConnection():ExpectNotification("BasicCommunication.OnAppRegistered", {
-          application = { appName = m.getConfigAppParams(pAppId).appName }
-        })
-      mobSession:ExpectResponse(corId, { success = true, resultCode = "SUCCESS" })
-      :Do(function()
-          mobSession:ExpectNotification("OnPermissionsChange")
-        end)
+    local params = m.cloneTable(m.getConfigAppParams(pAppId))
+    params.hashID = m.hashId[pAppId]
+    local corId = mobSession:SendRPC("RegisterAppInterface", params)
+    m.getHMIConnection():ExpectNotification("BasicCommunication.OnAppRegistered", {
+      application = { appName = m.getConfigAppParams(pAppId).appName }
+    })
+    mobSession:ExpectResponse(corId, { success = true, resultCode = "SUCCESS" })
+    :Do(function()
+      mobSession:ExpectNotification("OnPermissionsChange")
     end)
+  end)
   pCheckResumptionData(pAppId)
   pCheckResumptionHMILevel(pAppId)
 end
@@ -256,8 +255,8 @@ end
 function m.resumptionFullHMILevel(pAppId)
   m.getHMIConnection():ExpectRequest("BasicCommunication.ActivateApp", { appID = m.getHMIAppId(pAppId) })
   :Do(function(_, data)
-      m.getHMIConnection():SendResponse(data.id, "BasicCommunication.ActivateApp", "SUCCESS", {})
-    end)
+    m.getHMIConnection():SendResponse(data.id, "BasicCommunication.ActivateApp", "SUCCESS", {})
+  end)
   m.getMobileSession(pAppId):ExpectNotification("OnHMIStatus",
     { hmiLevel = "NONE", audioStreamingState = "NOT_AUDIBLE", systemContext = "MAIN" },
     { hmiLevel = "FULL", systemContext = "MAIN", audioStreamingState = "AUDIBLE" })
@@ -279,27 +278,27 @@ function m.ignitionOff()
   event.matches = function(event1, event2) return event1 == event2 end
   EXPECT_EVENT(event, "SDL shutdown")
   :Do(function()
-      removeSessions()
-      StopSDL()
-      m.wait(1000)
-    end)
+    removeSessions()
+    StopSDL()
+    m.wait(1000)
+  end)
   m.getHMIConnection():SendNotification("BasicCommunication.OnExitAllApplications", { reason = "SUSPEND" })
   EXPECT_HMINOTIFICATION("BasicCommunication.OnSDLPersistenceComplete")
   :Do(function()
-      m.getHMIConnection():SendNotification("BasicCommunication.OnExitAllApplications",{ reason = "IGNITION_OFF" })
-      for i = 1, m.getAppsCount() do
-        m.getMobileSession(i):ExpectNotification("OnAppInterfaceUnregistered", { reason = "IGNITION_OFF" })
-      end
-    end)
+    m.getHMIConnection():SendNotification("BasicCommunication.OnExitAllApplications",{ reason = "IGNITION_OFF" })
+    for i = 1, m.getAppsCount() do
+      m.getMobileSession(i):ExpectNotification("OnAppInterfaceUnregistered", { reason = "IGNITION_OFF" })
+    end
+  end)
   EXPECT_HMINOTIFICATION("BasicCommunication.OnAppUnregistered", { unexpectedDisconnect = false })
   :Times(m.getAppsCount())
   local isSDLShutDownSuccessfully = false
   EXPECT_HMINOTIFICATION("BasicCommunication.OnSDLClose")
   :Do(function()
-      utils.cprint(35, "SDL was shutdown successfully")
-      isSDLShutDownSuccessfully = true
-      RAISE_EVENT(event, event)
-    end)
+    utils.cprint(35, "SDL was shutdown successfully")
+    isSDLShutDownSuccessfully = true
+    RAISE_EVENT(event, event)
+  end)
   :Timeout(timeout)
   local function forceStopSDL()
     if isSDLShutDownSuccessfully == false then
@@ -315,29 +314,29 @@ end
 --! pAppId: application number (1, 2, etc.)
 --! pCheckResumptionData - verification function for resumption data
 --! pCheckResumptionHMILevel - verification function for resumption HMI level
---! pErrorResponceRpc - RPC name for error response
+--! pErrorResponseRpc - RPC name for error response
 --! pRAIResponseExp - time for expectation of RAI response
 --! @return: none
 --]]
-function m.reRegisterApp(pAppId, pCheckResumptionData, pCheckResumptionHMILevel, pErrorResponceRpc, pRAIResponseExp)
+function m.reRegisterApp(pAppId, pCheckResumptionData, pCheckResumptionHMILevel, pErrorResponseRpc, pRAIResponseExp)
   if not pAppId then pAppId = 1 end
   if not pRAIResponseExp then pRAIResponseExp = 10000 end
   local mobSession = m.getMobileSession(pAppId)
   mobSession:StartService(7)
   :Do(function()
-      local params = m.cloneTable(m.getConfigAppParams(pAppId))
-      params.hashID = m.hashId[pAppId]
-      local corId = mobSession:SendRPC("RegisterAppInterface", params)
-      m.getHMIConnection():ExpectNotification("BasicCommunication.OnAppRegistered", {
-          application = { appName = m.getConfigAppParams(pAppId).appName }
-        })
-      mobSession:ExpectResponse(corId, { success = true, resultCode = pErrorResponceRpc })
-      :Do(function()
-          pCheckResumptionHMILevel(pAppId)
-          mobSession:ExpectNotification("OnPermissionsChange")
-        end)
-      :Timeout(pRAIResponseExp)
+    local params = m.cloneTable(m.getConfigAppParams(pAppId))
+    params.hashID = m.hashId[pAppId]
+    local corId = mobSession:SendRPC("RegisterAppInterface", params)
+    m.getHMIConnection():ExpectNotification("BasicCommunication.OnAppRegistered", {
+      application = { appName = m.getConfigAppParams(pAppId).appName }
+    })
+    mobSession:ExpectResponse(corId, { success = true, resultCode = pErrorResponseRpc })
+    :Do(function()
+      pCheckResumptionHMILevel(pAppId)
+      mobSession:ExpectNotification("OnPermissionsChange")
     end)
+    :Timeout(pRAIResponseExp)
+  end)
   pCheckResumptionData(pAppId)
 end
 

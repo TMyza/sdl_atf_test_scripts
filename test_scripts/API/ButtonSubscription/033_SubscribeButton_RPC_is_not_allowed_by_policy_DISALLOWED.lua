@@ -1,11 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 -- Proposal:
 -- https://github.com/smartdevicelink/sdl_evolution/blob/master/proposals/0192-button_subscription_response_from_hmi.md
--- User story: TBD
--- Use case: TBD
---
--- Requirement summary: TBD
---
 -- Description:
 -- In case:
 -- 1) SubscribeButton RPC is not allowed by policy
@@ -39,7 +34,7 @@ runner.Step("PTU", common.policyTableUpdate, { pTUpdateFunc })
 runner.Step("App activation", common.activateApp)
 
 runner.Title("Test")
-runner.Step("SubscribeButton on " .. buttonName .. " button, Disalloved",
+runner.Step("SubscribeButton on " .. buttonName .. " button, disallowed",
     common.rpcUnsuccess, { 1, "SubscribeButton", buttonName, errorCode })
 runner.Step("Button ".. buttonName .. " wasn't Subscribed", common.buttonPressUnsuccess, { 1, buttonName })
 
