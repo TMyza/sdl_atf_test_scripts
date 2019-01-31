@@ -31,6 +31,14 @@ local common = require('test_scripts/API/ServiceStatusUpdateToHMI/common')
 --[[ Test Configuration ]]
 runner.testSettings.isSelfIncluded = false
 
+--[[ Local Functions ]]
+local function ptUpdate(pTbl)
+  local filePath = "./files/Security/GetSystemTime_certificates/client_credential.pem"
+  local crt = common.readFile(filePath)
+  pTbl.policy_table.module_config.certificate = crt
+end
+
+
 --[[ Scenario ]]
 runner.Title("Preconditions")
 runner.Step("Clean environment", common.preconditions)
@@ -38,7 +46,8 @@ runner.Step("Init SDL certificates", common.initSDLCertificates,
   { "./files/Security/client_credential_expired.pem", false })
 runner.Step("Start SDL, HMI, connect Mobile, start Session", common.start)
 runner.Step("App registration", common.registerApp)
-runner.Step("PolicyTableUpdate", common.policyTableUpdate)
+-- runner.Step("PolicyTableUpdate", common.policyTableUpdate)
+runner.Step("PolicyTableUpdate with certificate", common.policyTableUpdate, { ptUpdate })
 runner.Step("App activation", common.activateApp)
 
 runner.Title("Test")
