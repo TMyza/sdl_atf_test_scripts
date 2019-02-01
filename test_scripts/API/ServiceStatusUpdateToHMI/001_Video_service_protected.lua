@@ -33,7 +33,7 @@ runner.testSettings.isSelfIncluded = false
 
 --[[ Local Functions ]]
 local function ptUpdate(pTbl)
-  local filePath = "./files/Security/GetSystemTime_certificates/client_credential.pem"
+  local filePath = "./files/Security/client_credential.pem"
   local crt = common.readFile(filePath)
   pTbl.policy_table.module_config.certificate = crt
 end

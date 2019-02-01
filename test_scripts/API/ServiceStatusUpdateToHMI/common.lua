@@ -19,37 +19,37 @@ local m = actions
 m.wait = utils.wait
 
 --[[ Common Functions ]]
-function m.getSystemTimeValue()
-  return {
-    millisecond = 100,
-    second = 30,
-    minute = 29,
-    hour = 15,
-    day = 20,
-    month = 3,
-    year = 2018,
-    tz_hour = -3,
-    tz_minute = 10
-  }
-end
+-- function m.getSystemTimeValue()
+--   return {
+--     millisecond = 100,
+--     second = 30,
+--     minute = 29,
+--     hour = 15,
+--     day = 20,
+--     month = 3,
+--     year = 2018,
+--     tz_hour = -3,
+--     tz_minute = 10
+--   }
+-- end
 
-local startOrigin =  m.start
-function m.start()
-  startOrigin()
-  actions.getHMIConnection():ExpectRequest("BasicCommunication.GetSystemTime")
-  :Do(function(_, data)
-      actions.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { systemTime = m.getSystemTimeValue() })
-    end)
-  :Pin()
-  :Times(AnyNumber())
-end
+-- local startOrigin =  m.start
+-- function m.start()
+--   startOrigin()
+--   actions.getHMIConnection():ExpectRequest("BasicCommunication.GetSystemTime")
+--   :Do(function(_, data)
+--       actions.getHMIConnection():SendResponse(data.id, data.method, "SUCCESS", { systemTime = m.getSystemTimeValue() })
+--     end)
+--   :Pin()
+--   :Times(AnyNumber())
+-- end
 
-function m.ptUpdate(pTbl)
-  print_table(m.getSystemTimeValue())
-  local filePath = "./files/Security/client_credential.pem"
-  local crt = utils.readFile(filePath)
-  pTbl.policy_table.module_config.certificate = crt
-end
+-- function m.ptUpdate(pTbl)
+--   print_table(m.getSystemTimeValue())
+--   local filePath = "./files/Security/client_credential.pem"
+--   local crt = utils.readFile(filePath)
+--   pTbl.policy_table.module_config.certificate = crt
+-- end
 
 local preconditionsOrig = common.preconditions
 function m.preconditions(pForceProtectedServices, pForceUnprotectedServices)
@@ -215,10 +215,10 @@ function m.serviceStatusWithGetSystemTimeUnsuccess(pServiceTypeValue, pAppId)
       data.method == "BasicCommunication.GetSystemTime"
     end
 
-  common.getHMIConnection():ExpectEvent(startserviceEvent, "GetSystemTime")
-  :Do(function(_, data)
-      m.getSystemTimeRes(data)
-    end)
+  -- common.getHMIConnection():ExpectEvent(startserviceEvent, "GetSystemTime")
+  -- :Do(function(_, data)
+  --     m.getSystemTimeRes(data)
+  --   end)
 end
 
 function common.serviceResponseWithACKandNACK(pServiceId, pStreamingFunc, pTimeout)
